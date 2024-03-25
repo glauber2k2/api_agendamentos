@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 })
 
 class UserController {
-  async sendMail(req: Request, res: Response) {
+  async sendMailForgotPass(req: Request, res: Response) {
     const { email } = req.body
     const repository = getRepository(User)
 
