@@ -23,7 +23,7 @@ class UserController {
 
       if (user) {
         await transporter.sendMail({
-          from: 'TimeAlign',
+          from: `TimeAlign <${process.env.GMAIL_ACCOUNT}>`,
           to: user.email,
           subject: 'Redefinir senha',
           html: '<b>Link para redefinir senha.</b>',
