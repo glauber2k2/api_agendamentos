@@ -51,18 +51,23 @@ class UserController {
                   text-align: center;
                 }
                 .content {
-                  margin-top: 20px;
+                  height: 100%;
                 }
                 .content p{
                   color: black;
                   font-size: 14px;
-                  margin-bottom: 14px;
+                  margin-top: 14px;
+                }
+                .content small{
+                  color: black;
+                  font-size: 12px;
                 }
                 .btn, .btn:link, .btn:visited, .btn:hover, .btn:active {
-                  margin: auto;
+                  margin-top: 10px;
+                  width: 100%;
                   background-color: #7c3aed; 
                   color: white !important; 
-                  padding: 10px 22px; 
+                  padding: 10px 0; 
                   text-align: center;
                   font-weight: 600;
                   text-decoration: none; 
@@ -90,6 +95,8 @@ class UserController {
                 Insira o código de redefinição de senha a seguir:
                 </p>
                 <a href="${resetPasswordLink}" class="btn">Redefinir</a>
+                <small>enviamos esse email para ${user.email} por uma solicitação de redefinir senha, caso não tenha sido você, poderá ignorar esse email.
+                </small>
               </div>
             </div>
 
