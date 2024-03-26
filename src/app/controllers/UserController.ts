@@ -2,8 +2,14 @@ import { Request, Response } from 'express'
 import { getRepository } from 'typeorm'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const nodemailer = require('nodemailer')
+import jwt, { JwtPayload } from 'jsonwebtoken'
+import bcrypt from 'bcryptjs'
 
 import User from '../models/User'
+
+interface MyJwtPayload extends JwtPayload {
+  userId: string
+}
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -22,11 +28,18 @@ class UserController {
       const user = await repository.findOne({ where: { email } })
 
       if (user) {
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+          expiresIn: '1h',
+        })
+
+        const resetPasswordLink = `${process.env.APP_BASEURL}/nova-senha?token=${token}`
+        const emailHtml = `<b>Clique no link a seguir para redefinir sua senha:</b> <a href="${resetPasswordLink}">${resetPasswordLink}</a>`
+
         await transporter.sendMail({
           from: `TimeAlign <${process.env.GMAIL_ACCOUNT}>`,
           to: user.email,
           subject: 'Redefinir senha',
-          html: '<b>Link para redefinir senha.</b>',
+          html: emailHtml,
         })
 
         return res.sendStatus(200)
@@ -34,6 +47,30 @@ class UserController {
       return res.sendStatus(200)
     } catch (error) {
       return res.sendStatus(500)
+    }
+  }
+
+  async updatePass(req: Request, res: Response) {
+    const { newPassword, token } = req.body
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET) as MyJwtPayload
+      const userId = decoded.userId
+
+      const repository = getRepository(User)
+      const user = await repository.findOne(userId)
+
+      if (!user) {
+        return res.status(404).json({ message: 'Usuário não encontrado.' })
+      }
+
+      user.password = await bcrypt.hash(newPassword, 8)
+
+      await repository.save(user)
+
+      return res.status(200).json({ message: 'Senha alterada com sucesso.' })
+    } catch (error) {
+      return res.status(400).json({ message: 'Token inválido ou expirado.' })
     }
   }
 

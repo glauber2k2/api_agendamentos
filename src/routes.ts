@@ -10,6 +10,7 @@ const router = Router()
 router.post('/auth', AuthController.authenticate)
 router.post('/users', UserController.store)
 router.post('/forgot_pass', UserController.sendMailForgotPass)
+router.post('/change_pass', UserController.updatePass)
 router.put('/users', authMiddleware, UserController.update)
 router.get('/users', authMiddleware, UserController.getById)
 

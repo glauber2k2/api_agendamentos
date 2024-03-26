@@ -39,11 +39,6 @@ class User {
   getOriginalPassword() {
     return this.id ? this.password : null
   }
-
-  // Método para atualizar a senha e aplicar criptografia
-  async updatePassword(newPassword: string) {
-    this.password = await bcrypt.hash(newPassword, 8)
-  }
 }
 
 export default User
