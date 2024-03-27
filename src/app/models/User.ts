@@ -6,6 +6,9 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm'
 import bcrypt from 'bcryptjs'
+import { OneToMany } from 'typeorm'
+
+import Company from './Company'
 
 @Entity('users')
 class User {
@@ -23,6 +26,9 @@ class User {
 
   @Column()
   password: string
+
+  @OneToMany(() => Company, (company) => company.user)
+  companies: Company[]
 
   @BeforeInsert()
   @BeforeUpdate()
