@@ -56,13 +56,13 @@ class CompanyController {
       cnpj,
       identifier,
       descricao,
-      usuario_vinculado,
       main_company_id,
     } = req.body
+    const id = req.userId
 
     try {
       const userRepository = getRepository(User)
-      const user = await userRepository.findOne(usuario_vinculado)
+      const user = await userRepository.findOne(id)
 
       if (!user) {
         return res.status(404).json({ message: 'Usuário não encontrado.' })
