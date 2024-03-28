@@ -5,6 +5,24 @@ import Company from '../models/Company'
 import User from '../models/User'
 
 class CompanyController {
+  async getCompanyByIdentifier(req: Request, res: Response) {
+    const identifier = req.params.identifier
+
+    try {
+      const companyRepository = getRepository(Company)
+      const company = await companyRepository.findOne({ where: { identifier } })
+
+      if (!company) {
+        return res.status(404).json({ message: 'Empresa não encontrada.' })
+      }
+
+      return res.json(company)
+    } catch (error) {
+      console.error('Error fetching company by identifier:', error)
+      return res.sendStatus(500)
+    }
+  }
+
   async listUserCompanies(req: Request, res: Response) {
     const id = req.userId
 

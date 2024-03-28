@@ -25,5 +25,6 @@ router.get(
   CompanyController.listUserCompanies,
 )
 router.get('/companies/:parentCompanyId?', CompanyController.listCompanies)
+router.get('/company/:identifier?', CompanyController.getCompanyByIdentifier)
 
 export default router
