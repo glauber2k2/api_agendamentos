@@ -19,11 +19,11 @@ router.get('/users', authMiddleware, UserController.getById)
 router.post('/recover_password', MailController.ForgotPassword)
 
 router.post('/companies', authMiddleware, CompanyController.create)
-router.get('/companies/:userId?', CompanyController.list)
 router.get(
-  '/child_company/:parentCompanyId',
+  '/user_companies',
   authMiddleware,
-  CompanyController.getChildCompanies,
+  CompanyController.listUserCompanies,
 )
+router.get('/companies/:parentCompanyId?', CompanyController.listCompanies)
 
 export default router

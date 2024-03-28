@@ -5,27 +5,15 @@ import Company from '../models/Company'
 import User from '../models/User'
 
 class CompanyController {
-  async list(req: Request, res: Response) {
-    const userId = req.params.userId
-    const repository = getRepository(User)
-
-    const user = await repository.findOne(userId)
-
-    if (!user) {
-      return res.sendStatus(404)
-    }
+  async listUserCompanies(req: Request, res: Response) {
+    const id = req.userId
 
     try {
       const companyRepository = getRepository(Company)
 
-      if (userId) {
-        const companies = await companyRepository.find({
-          where: { user: userId },
-        })
-        return res.json(companies)
-      }
-
-      const companies = await companyRepository.find()
+      const companies = await companyRepository.find({
+        where: { user: id },
+      })
       return res.json(companies)
     } catch (error) {
       console.error('Error listing companies:', error)
@@ -33,14 +21,22 @@ class CompanyController {
     }
   }
 
-  async getChildCompanies(req: Request, res: Response) {
+  async listCompanies(req: Request, res: Response) {
     const parentId = req.params.parentCompanyId
 
     try {
       const companyRepository = getRepository(Company)
-      const childCompanies = await companyRepository.find({
-        where: { main_company_id: parentId },
-      })
+      let childCompanies
+
+      if (!parentId) {
+        // Se nenhum parentId for fornecido, lista todas as empresas
+        childCompanies = await companyRepository.find()
+      } else {
+        // Caso contrário, filtra as empresas pelo parentId fornecido
+        childCompanies = await companyRepository.find({
+          where: { main_company_id: parentId },
+        })
+      }
 
       return res.json(childCompanies)
     } catch (error) {
