@@ -26,11 +26,17 @@ export class CreateCompanysTable1711570973174 implements MigrationInterface {
             isUnique: true,
           },
           {
-            name: 'nome',
+            name: 'isVisible',
+            type: 'boolean',
+            default: true,
+            isNullable: true,
+          },
+          {
+            name: 'name',
             type: 'varchar',
           },
           {
-            name: 'nome_fantasia',
+            name: 'business_name',
             type: 'varchar',
           },
           {
@@ -40,7 +46,7 @@ export class CreateCompanysTable1711570973174 implements MigrationInterface {
             length: '14',
           },
           {
-            name: 'descricao',
+            name: 'description',
             type: 'text',
             isNullable: true,
           },
