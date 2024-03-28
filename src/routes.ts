@@ -24,7 +24,10 @@ router.get(
   authMiddleware,
   CompanyController.listUserCompanies,
 )
-router.get('/companies/:parentCompanyId?', CompanyController.listCompanies)
-router.get('/company/:identifier?', CompanyController.getCompanyByIdentifier)
+router.get(
+  '/children_companies/:parentCompanyId',
+  CompanyController.listChildCompanies,
+)
+router.get('/companies/:identifier?', CompanyController.getCompanyByIdentifier)
 
 export default router

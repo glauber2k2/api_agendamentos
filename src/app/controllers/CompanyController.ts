@@ -6,17 +6,25 @@ import User from '../models/User'
 
 class CompanyController {
   async getCompanyByIdentifier(req: Request, res: Response) {
-    const identifier = req.params.identifier
+    const { identifier } = req.params
 
     try {
       const companyRepository = getRepository(Company)
-      const company = await companyRepository.findOne({ where: { identifier } })
+      let companies
 
-      if (!company) {
-        return res.status(404).json({ message: 'Empresa não encontrada.' })
+      if (identifier) {
+        const company = await companyRepository.findOne({
+          where: { identifier },
+        })
+        if (!company) {
+          return res.status(404).json({ message: 'Empresa não encontrada.' })
+        }
+        companies = [company]
+      } else {
+        companies = await companyRepository.find()
       }
 
-      return res.json(company)
+      return res.json(companies)
     } catch (error) {
       console.error('Error fetching company by identifier:', error)
       return res.sendStatus(500)
@@ -39,21 +47,24 @@ class CompanyController {
     }
   }
 
-  async listCompanies(req: Request, res: Response) {
+  async listChildCompanies(req: Request, res: Response) {
     const parentId = req.params.parentCompanyId
 
     try {
       const companyRepository = getRepository(Company)
       let childCompanies
 
-      if (!parentId) {
-        // Se nenhum parentId for fornecido, lista todas as empresas
-        childCompanies = await companyRepository.find()
-      } else {
-        // Caso contrário, filtra as empresas pelo parentId fornecido
+      // Verifica se foi fornecido o parentId
+      if (parentId) {
+        // Filtra as empresas pelo parentId fornecido
         childCompanies = await companyRepository.find({
           where: { main_company_id: parentId },
         })
+      } else {
+        // Retorna um erro indicando que o parentId não foi fornecido
+        return res
+          .status(400)
+          .json({ message: 'O ID da empresa pai não foi fornecido.' })
       }
 
       return res.json(childCompanies)
