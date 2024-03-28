@@ -16,6 +16,16 @@ export class CreateCompanysTable1711570973174 implements MigrationInterface {
             default: 'uuid_generate_v4()',
           },
           {
+            name: 'main_company_id',
+            type: 'uuid',
+            isNullable: true,
+          },
+          {
+            name: 'identifier',
+            type: 'varchar',
+            isUnique: true,
+          },
+          {
             name: 'nome',
             type: 'varchar',
           },
@@ -28,10 +38,6 @@ export class CreateCompanysTable1711570973174 implements MigrationInterface {
             type: 'varchar',
             isUnique: true,
             length: '14',
-          },
-          {
-            name: 'plano',
-            type: 'int',
           },
           {
             name: 'descricao',
@@ -51,12 +57,19 @@ export class CreateCompanysTable1711570973174 implements MigrationInterface {
             referencedColumnNames: ['id'],
             onDelete: 'CASCADE',
           },
+          {
+            columnNames: ['main_company_id'],
+            referencedTableName: 'companies',
+            referencedColumnNames: ['id'],
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
+          },
         ],
       }),
     )
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('empresas')
+    await queryRunner.dropTable('companies')
   }
 }

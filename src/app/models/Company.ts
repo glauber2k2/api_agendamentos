@@ -13,6 +13,9 @@ class Company {
   id: string
 
   @Column()
+  identifier: string
+
+  @Column()
   nome: string
 
   @Column()
@@ -21,11 +24,14 @@ class Company {
   @Column({ unique: true, length: 14 })
   cnpj: string
 
-  @Column()
-  plano: string
-
   @Column({ nullable: true })
   descricao: string
+
+  @ManyToOne(() => Company, (company) => company.main_company_id, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'main_company_id' })
+  main_company_id: Company
 
   @ManyToOne(() => User, (user) => user.companies)
   @JoinColumn({ name: 'owner' })

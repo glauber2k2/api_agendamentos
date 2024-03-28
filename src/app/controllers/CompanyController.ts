@@ -33,9 +33,32 @@ class CompanyController {
     }
   }
 
+  async getChildCompanies(req: Request, res: Response) {
+    const parentId = req.params.parentCompanyId
+
+    try {
+      const companyRepository = getRepository(Company)
+      const childCompanies = await companyRepository.find({
+        where: { main_company_id: parentId },
+      })
+
+      return res.json(childCompanies)
+    } catch (error) {
+      console.error('Error fetching child companies:', error)
+      return res.sendStatus(500)
+    }
+  }
+
   async create(req: Request, res: Response) {
-    const { nome, nome_fantasia, cnpj, plano, descricao, usuario_vinculado } =
-      req.body
+    const {
+      nome,
+      nome_fantasia,
+      cnpj,
+      identifier,
+      descricao,
+      usuario_vinculado,
+      main_company_id,
+    } = req.body
 
     try {
       const userRepository = getRepository(User)
@@ -46,14 +69,31 @@ class CompanyController {
       }
 
       const companyRepository = getRepository(Company)
+      let mainCompanyInstance = null
+
+      // Verifica se foi fornecido o ID da empresa principal
+      if (main_company_id) {
+        // Se fornecido, busca a empresa correspondente pelo ID
+        mainCompanyInstance = await companyRepository.findOne(main_company_id)
+
+        if (!mainCompanyInstance) {
+          return res
+            .status(404)
+            .json({ message: 'Empresa principal não encontrada.' })
+        }
+      }
+
+      // Cria a empresa filha
       const company = companyRepository.create({
         nome,
         nome_fantasia,
         cnpj,
-        plano,
+        identifier,
         descricao,
-        user,
+        main_company_id: mainCompanyInstance, // Vincula a empresa ao mainCompany (empresa pai), se fornecido
+        user, // Vincula a empresa ao usuário
       })
+
       await companyRepository.save(company)
 
       return res.status(201).json(company)
