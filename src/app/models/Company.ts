@@ -34,7 +34,7 @@ class Company {
   main_company_id: Company
 
   @ManyToOne(() => User, (user) => user.companies)
-  @JoinColumn({ name: 'owner' })
+  @JoinColumn({ name: 'user' })
   user: User
 }
 

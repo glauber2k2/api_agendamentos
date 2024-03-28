@@ -45,14 +45,14 @@ export class CreateCompanysTable1711570973174 implements MigrationInterface {
             isNullable: true,
           },
           {
-            name: 'owner',
+            name: 'user',
             type: 'uuid',
             isNullable: false,
           },
         ],
         foreignKeys: [
           {
-            columnNames: ['owner'],
+            columnNames: ['user'],
             referencedTableName: 'users',
             referencedColumnNames: ['id'],
             onDelete: 'CASCADE',
