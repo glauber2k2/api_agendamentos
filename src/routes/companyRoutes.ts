@@ -77,21 +77,30 @@ router.get(
 
 /**
  * @swagger
- * /user_companies/{parentCompanyId}:
+ * /companies:
  *   get:
- *     summary: Listar Empresas vinculadas a empresa principal.
- *     description: Rota para listar empresas vinculadas a empresa principal.
+ *     summary: Lista todas as empresas ou aplica filtros opcionais.
+ *     description: Rota para listar todas as empresas ou aplicar filtros opcionais.
  *     tags: [Company]
  *     parameters:
- *       - in: path
- *         name: parentCompanyId
- *         required: true
- *         description: ID da empresa principal para o qual buscar as empresas vinculadas.
+ *       - in: query
+ *         name: ChildBy
  *         schema:
  *           type: string
+ *         description: ID da empresa pai para filtrar as empresas filhas.
+ *       - in: query
+ *         name: identifier
+ *         schema:
+ *           type: string
+ *         description: Identificador da empresa para recuperar uma empresa específica.
+ *       - in: query
+ *         name: visibleCompanies
+ *         schema:
+ *           type: boolean
+ *         description: Filtra as empresas que são visíveis (true) ou não (false).
  *     responses:
- *       200:
- *         description: Retorno das empresas vinculadas a empresa principal.
+ *       '200':
+ *         description: OK
  *         content:
  *           application/json:
  *             schema:
@@ -113,52 +122,13 @@ router.get(
  *                     type: string
  *                   description:
  *                     type: string
+ *       '400':
+ *         description: Parâmetros de consulta inválidos.
+ *       '404':
+ *         description: Empresa não encontrada.
+ *       '500':
+ *         description: Erro interno do servidor.
  */
-
-router.get(
-  '/children_companies/:parentCompanyId',
-  CompanyController.listChildCompanies,
-)
-
-/**
- * @swagger
- * /companies/{identifier}:
- *   get:
- *     summary: Obter informações da empresa por identificador ou listar todas as empresas.
- *     description:
- *       Rota para obter informações de uma empresa específica com base no identificador fornecido
- *       ou listar todas as empresas se nenhum identificador for fornecido.
- *     tags: [Company]
- *     parameters:
- *       - in: path
- *         name: identifier
- *         required: false
- *         description: O identificador da empresa a ser retornada.
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Informações da empresa recuperadas com sucesso.
- *         content:
- *           application/json:
- *             schema:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                   identifier:
- *                     type: string
- *                   isVisible:
- *                     type: boolean
- *                   name:
- *                     type: string
- *                   business_name:
- *                     type: string
- *                   cnpj:
- *                     type: string
- *                   description:
- *                     type: string
- */
-router.get('/companies/:identifier?', CompanyController.getCompanyByIdentifier)
+router.get('/companies', CompanyController.listCompanies)
 
 export default router

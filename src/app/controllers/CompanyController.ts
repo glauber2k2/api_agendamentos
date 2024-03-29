@@ -5,32 +5,6 @@ import Company from '../models/Company'
 import User from '../models/User'
 
 class CompanyController {
-  async getCompanyByIdentifier(req: Request, res: Response) {
-    const { identifier } = req.params
-
-    try {
-      const companyRepository = getRepository(Company)
-      let companies
-
-      if (identifier) {
-        const company = await companyRepository.findOne({
-          where: { identifier },
-        })
-        if (!company) {
-          return res.status(404).json({ message: 'Empresa não encontrada.' })
-        }
-        companies = company
-      } else {
-        companies = await companyRepository.find()
-      }
-
-      return res.json(companies)
-    } catch (error) {
-      console.error('Error fetching company by identifier:', error)
-      return res.sendStatus(500)
-    }
-  }
-
   async listUserCompanies(req: Request, res: Response) {
     const id = req.userId
 
@@ -47,29 +21,45 @@ class CompanyController {
     }
   }
 
-  async listChildCompanies(req: Request, res: Response) {
-    const parentId = req.params.parentCompanyId
-
+  async listCompanies(req: Request, res: Response) {
     try {
+      const { ChildBy, identifier, visibleCompanies } = req.query
       const companyRepository = getRepository(Company)
-      let childCompanies
+      let companies
 
-      // Verifica se foi fornecido o parentId
-      if (parentId) {
-        // Filtra as empresas pelo parentId fornecido
-        childCompanies = await companyRepository.find({
-          where: { main_company_id: parentId },
+      // Se o filtro ChildBy estiver presente na query params
+      if (ChildBy) {
+        // Verifica se o parentId foi fornecido
+        const childCompanies = await companyRepository.find({
+          where: { main_company_id: ChildBy },
         })
-      } else {
-        // Retorna um erro indicando que o parentId não foi fornecido
-        return res
-          .status(400)
-          .json({ message: 'O ID da empresa pai não foi fornecido.' })
+        return res.json(childCompanies)
       }
 
-      return res.json(childCompanies)
+      // Se o filtro identifier estiver presente na query params
+      if (identifier) {
+        const company = await companyRepository.findOne({
+          where: { identifier },
+        })
+        if (!company) {
+          return res.status(404).json({ message: 'Empresa não encontrada.' })
+        }
+        companies = [company]
+      } else {
+        // Se o filtro visibleCompanies estiver presente na query params
+        if (visibleCompanies) {
+          companies = await companyRepository.find({
+            where: { isVisible: true },
+          })
+        } else {
+          // Retorna todas as empresas sem filtro
+          companies = await companyRepository.find()
+        }
+      }
+
+      return res.json(companies)
     } catch (error) {
-      console.error('Error fetching child companies:', error)
+      console.error('Error fetching companies:', error)
       return res.sendStatus(500)
     }
   }
