@@ -19,7 +19,7 @@ class CompanyController {
         if (!company) {
           return res.status(404).json({ message: 'Empresa não encontrada.' })
         }
-        companies = [company]
+        companies = company
       } else {
         companies = await companyRepository.find()
       }
