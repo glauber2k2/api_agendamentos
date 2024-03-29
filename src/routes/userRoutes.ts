@@ -58,6 +58,8 @@ router.post('/new_password', UserController.newPassword)
  *     summary: Editar usuário.
  *     description: Rota para editar informações de um usuário.
  *     tags: [User]
+ *     security:
+ *      - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -78,9 +80,27 @@ router.put('/users', authMiddleware, UserController.update)
  * @swagger
  * /users:
  *   get:
- *     summary: Editar usuário.
- *     description: Rota para listar informações do usuário logado.
+ *     summary: Obter informações do usuário autenticado.
+ *     description: Rota para obter informações do usuário autenticado.
  *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Informações do usuário autenticado obtidas com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 username:
+ *                   type: string
  */
 router.get('/users', authMiddleware, UserController.getById)
 

@@ -15,9 +15,35 @@ router.use(companyRoutes)
  * @swagger
  * /auth:
  *   post:
- *     summary: Autenticação do usuário
- *     description: Rota responsável por autenticar o usuário no sistema.
+ *     summary: Autenticar no sistema.
+ *     description: Rota para autenticar no sistema.
  *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Usuario autenticado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 username:
+ *                   type: string
+ */
+router.post('/auth', AuthController.authenticate)
+
+/**
+ * @swagger
+ * /recover_password:
+ *   post:
+ *     summary: Enviar email para recuperação de senha.
+ *     description: Rota para enviar um email com instruções para recuperação de senha.
+ *     tags: [Mail]
  *     requestBody:
  *       required: true
  *       content:
@@ -25,23 +51,9 @@ router.use(companyRoutes)
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 description: Nome de usuário do usuário.
- *               password:
- *                 type: string
- *                 format: password
- *                 description: Senha do usuário.
- *     responses:
- *       '200':
- *         description: Autenticação bem-sucedida. Retorna o token de acesso.
- *       '401':
- *         description: Falha na autenticação. Credenciais inválidas.
- *       '500':
- *         description: Erro interno do servidor.
  */
-router.post('/auth', AuthController.authenticate)
-
 router.post('/recover_password', MailController.ForgotPassword)
 
 export default router
