@@ -142,8 +142,6 @@ router.get(
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
  *                 type: object
  *                 properties:
  *                   id:
