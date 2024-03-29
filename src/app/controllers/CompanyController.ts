@@ -76,11 +76,11 @@ class CompanyController {
 
   async create(req: Request, res: Response) {
     const {
-      nome,
-      nome_fantasia,
+      name,
+      business_name,
       cnpj,
       identifier,
-      descricao,
+      description,
       main_company_id,
     } = req.body
     const id = req.userId
@@ -110,11 +110,11 @@ class CompanyController {
 
       // Cria a empresa filha
       const company = companyRepository.create({
-        nome,
-        nome_fantasia,
+        name,
+        business_name,
         cnpj,
         identifier,
-        descricao,
+        description,
         main_company_id: mainCompanyInstance, // Vincula a empresa ao mainCompany (empresa pai), se fornecido
         user, // Vincula a empresa ao usuário
       })

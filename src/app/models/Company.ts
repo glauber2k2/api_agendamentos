@@ -15,17 +15,20 @@ class Company {
   @Column()
   identifier: string
 
-  @Column()
-  nome: string
+  @Column({ nullable: true })
+  isVisible: boolean
 
   @Column()
-  nome_fantasia: string
+  name: string
+
+  @Column()
+  business_name: string
 
   @Column({ unique: true, length: 14 })
   cnpj: string
 
   @Column({ nullable: true })
-  descricao: string
+  description: string
 
   @ManyToOne(() => Company, (company) => company.main_company_id, {
     nullable: true,
