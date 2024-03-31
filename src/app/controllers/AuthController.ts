@@ -4,6 +4,7 @@ import { getRepository } from 'typeorm'
 import jwt from 'jsonwebtoken'
 
 import User from '../models/User'
+import { apiResponse } from '../../utils/apiResponse'
 
 class AuthController {
   async authenticate(req: Request, res: Response) {
@@ -13,13 +14,13 @@ class AuthController {
     const user = await repository.findOne({ where: { username } })
 
     if (!user) {
-      return res.sendStatus(401)
+      return apiResponse(res, 401, 'Usuário não encontrado.', false)
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password)
 
     if (!isValidPassword) {
-      return res.sendStatus(401)
+      return apiResponse(res, 401, 'Senha incorreta', false)
     }
 
     //TODO: Alterar chave "secret" para .env
@@ -29,7 +30,7 @@ class AuthController {
 
     delete user.password
 
-    return res.json({
+    return apiResponse(res, 200, 'Autenticado', true, {
       user,
       token,
     })

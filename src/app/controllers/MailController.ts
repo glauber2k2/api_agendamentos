@@ -5,6 +5,7 @@ import { getRepository } from 'typeorm'
 import jwt from 'jsonwebtoken'
 
 import User from '../models/User'
+import { apiResponse } from '../../utils/apiResponse'
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -106,11 +107,17 @@ class MailController {
           html: emailHtml,
         })
 
-        return res.sendStatus(200)
+        return apiResponse(res, 200, 'Sucesso', true)
       }
-      return res.sendStatus(200)
+      return apiResponse(res, 200, 'Sucesso', true)
     } catch (error) {
-      return res.sendStatus(500)
+      return apiResponse(
+        res,
+        500,
+        'Ocorreu um erro ao enviar o email.',
+        false,
+        error,
+      )
     }
   }
 }

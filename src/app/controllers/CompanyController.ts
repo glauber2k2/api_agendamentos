@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm'
 
 import Company from '../models/Company'
 import User from '../models/User'
+import { apiResponse } from '../../utils/apiResponse'
 
 class CompanyController {
   async listUserCompanies(req: Request, res: Response) {
@@ -14,10 +15,16 @@ class CompanyController {
       const companies = await companyRepository.find({
         where: { user: id },
       })
-      return res.json(companies)
+      return apiResponse(
+        res,
+        200,
+        'Empresas listadas com sucesso.',
+        true,
+        companies,
+      )
     } catch (error) {
       console.error('Error listing companies:', error)
-      return res.sendStatus(500)
+      return apiResponse(res, 500, 'Erro ao listas empresas', false, error)
     }
   }
 
@@ -33,7 +40,13 @@ class CompanyController {
         const childCompanies = await companyRepository.find({
           where: { main_company_id: ChildBy },
         })
-        return res.json(childCompanies)
+        return apiResponse(
+          res,
+          200,
+          'Sucesso ao listar empresas.',
+          true,
+          childCompanies,
+        )
       }
 
       // Se o filtro identifier estiver presente na query params
@@ -42,7 +55,7 @@ class CompanyController {
           where: { identifier },
         })
         if (!company) {
-          return res.status(404).json({ message: 'Empresa não encontrada.' })
+          return apiResponse(res, 404, 'Empresa não encontrada.', false)
         }
         companies = [company]
       } else {
@@ -57,10 +70,22 @@ class CompanyController {
         }
       }
 
-      return res.json(companies)
+      return apiResponse(
+        res,
+        200,
+        'Sucesso ao listar empresas.',
+        true,
+        companies,
+      )
     } catch (error) {
       console.error('Error fetching companies:', error)
-      return res.sendStatus(500)
+      return apiResponse(
+        res,
+        500,
+        'Ocorreu um erro ao listar empresas.',
+        false,
+        error,
+      )
     }
   }
 
@@ -80,21 +105,22 @@ class CompanyController {
       const user = await userRepository.findOne(id)
 
       if (!user) {
-        return res.status(404).json({ message: 'Usuário não encontrado.' })
+        return apiResponse(res, 404, 'Usuario não encontrado', false)
       }
 
       const companyRepository = getRepository(Company)
       let mainCompanyInstance = null
 
-      // Verifica se foi fornecido o ID da empresa principal
       if (main_company_id) {
-        // Se fornecido, busca a empresa correspondente pelo ID
         mainCompanyInstance = await companyRepository.findOne(main_company_id)
 
         if (!mainCompanyInstance) {
-          return res
-            .status(404)
-            .json({ message: 'Empresa principal não encontrada.' })
+          return apiResponse(
+            res,
+            404,
+            'Empresa principal não encontrada.',
+            false,
+          )
         }
       }
 
@@ -106,15 +132,26 @@ class CompanyController {
         identifier,
         description,
         main_company_id: mainCompanyInstance, // Vincula a empresa ao mainCompany (empresa pai), se fornecido
-        user, // Vincula a empresa ao usuário
+        user,
       })
 
       await companyRepository.save(company)
 
-      return res.status(201).json(company)
+      return apiResponse(
+        res,
+        201,
+        'Empresa cadastrada com sucesso.',
+        true,
+        company,
+      )
     } catch (error) {
       console.error('Error creating company:', error)
-      return res.sendStatus(500)
+      return apiResponse(
+        res,
+        500,
+        'Ocorreu um erro ao cadastrar a empresa.',
+        false,
+      )
     }
   }
 }
