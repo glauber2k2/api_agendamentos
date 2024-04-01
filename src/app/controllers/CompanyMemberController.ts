@@ -6,34 +6,71 @@ import User from '../models/User'
 import Invitation from '../models/Invitation'
 
 class CompanyController {
-  //TODO: Adaptar para aceitar convite e ser contratado.
   async addUserToCompany(req: Request, res: Response) {
-    const { userId, companyId } = req.body
+    const { invitationId, userId, status } = req.body
 
     try {
       const userRepository = getRepository(User)
-      const companyRepository = getRepository(Company)
       const userCompanyRepository = getRepository(UserCompany)
+      const invitationRepository = getRepository(Invitation)
 
-      // Verifique se o usuário e a empresa existem
-      const user = await userRepository.findOne(userId)
-      const company = await companyRepository.findOne(companyId)
-      if (!user || !company) {
+      // Verificar se o convite existe
+      const invitation = await invitationRepository.findOne(invitationId, {
+        relations: ['invitingCompany'],
+      })
+
+      if (!invitation) {
         return res.status(404).json({
           success: false,
-          message: 'Usuário ou empresa não encontrados.',
+          message: 'Convite não encontrado.',
         })
       }
 
-      // Crie uma nova entrada na tabela de junção UserCompany
-      const newUserCompany = new UserCompany()
-      newUserCompany.user = user
-      newUserCompany.company = company
-      await userCompanyRepository.save(newUserCompany)
+      // Verificar se o convite ainda está pendente
+      if (invitation.status !== 'pending') {
+        return res.status(400).json({
+          success: false,
+          message: 'O convite já foi processado.',
+        })
+      }
 
-      return res.status(201).json({
+      // Verificar se o status é válido
+      if (status !== 'accepted' && status !== 'rejected') {
+        return res.status(400).json({
+          success: false,
+          message: 'Status de convite inválido.',
+        })
+      }
+
+      // Aceitar ou rejeitar o convite
+      invitation.status = status
+      await invitationRepository.save(invitation)
+
+      if (status === 'accepted') {
+        // Adicionar usuário à empresa se o convite for aceito
+        const user = await userRepository.findOne(userId)
+        if (!user) {
+          return res.status(404).json({
+            success: false,
+            message: 'Usuário não encontrado.',
+          })
+        }
+
+        const newUserCompany = userCompanyRepository.create({
+          user,
+          company: invitation.invitingCompany,
+        })
+        await userCompanyRepository.save(newUserCompany)
+
+        return res.status(201).json({
+          success: true,
+          message: 'Usuário adicionado à empresa com sucesso.',
+        })
+      }
+
+      return res.status(200).json({
         success: true,
-        message: 'Usuário adicionado à empresa com sucesso.',
+        message: 'Convite rejeitado com sucesso.',
       })
     } catch (error) {
       console.error('Error adding user to company:', error)

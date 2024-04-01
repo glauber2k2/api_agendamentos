@@ -2,6 +2,7 @@ import { Router } from 'express'
 
 import userRoutes from './userRoutes'
 import companyRoutes from './companyRoutes'
+import companyMemberRoutes from './companyMemberRoutes'
 
 import AuthController from '../app/controllers/AuthController'
 import MailController from '../app/controllers/MailController'
@@ -10,6 +11,7 @@ const router = Router()
 
 router.use(userRoutes)
 router.use(companyRoutes)
+router.use(companyMemberRoutes)
 
 /**
  * @swagger
