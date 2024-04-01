@@ -105,7 +105,14 @@ class UserController {
       return apiResponse(res, 409, 'Usuário já existente', false)
     }
 
-    const user = repository.create({ email, password, name, username })
+    const encryptedPassword = bcrypt.hashSync(password, 8)
+
+    const user = repository.create({
+      email,
+      password: encryptedPassword,
+      name,
+      username,
+    })
     await repository.save(user)
 
     delete user.password
