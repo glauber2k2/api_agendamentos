@@ -14,13 +14,13 @@ export function apiResponse<T>(
   statusCode: number,
   message: string,
   success: boolean,
-  data: T | Record<string, never> = {},
+  responseData: T | Record<string, never> = {},
 ): void {
-  const responseData = {
+  const defaultResponse = {
     statusCode,
     message,
     success,
-    data,
+    responseData,
   }
-  res.json(responseData)
+  res.json(defaultResponse)
 }
