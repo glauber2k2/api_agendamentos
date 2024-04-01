@@ -4,8 +4,11 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm'
 import User from './User'
+import UserCompany from './CompanyUser'
+import Invitation from './Invitation'
 
 @Entity('companies')
 class Company {
@@ -15,7 +18,7 @@ class Company {
   @Column()
   identifier: string
 
-  @Column({ nullable: true })
+  @Column({ default: true })
   isVisible: boolean
 
   @Column()
@@ -39,6 +42,12 @@ class Company {
   @ManyToOne(() => User, (user) => user.companies)
   @JoinColumn({ name: 'user' })
   user: User
+
+  @OneToMany(() => UserCompany, (userCompany) => userCompany.company)
+  userCompanies: UserCompany[] // Relação com a tabela de junção
+
+  @OneToMany(() => Invitation, (invitation) => invitation.invitingCompany)
+  invitations: Invitation[]
 }
 
 export default Company

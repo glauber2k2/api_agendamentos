@@ -8,6 +8,8 @@ import {
 import { OneToMany } from 'typeorm'
 
 import Company from './Company'
+import UserCompany from './CompanyUser'
+import Invitation from './Invitation'
 
 @Entity('users')
 class User {
@@ -28,6 +30,12 @@ class User {
 
   @OneToMany(() => Company, (company) => company.user)
   companies: Company[]
+
+  @OneToMany(() => UserCompany, (userCompany) => userCompany.user)
+  userCompanies: UserCompany[] // Relação com a tabela de junção
+
+  @OneToMany(() => Invitation, (invitation) => invitation.invitedUser)
+  invitations: Invitation[]
 
   @BeforeInsert()
   @BeforeUpdate()

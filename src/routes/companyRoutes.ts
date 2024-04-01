@@ -2,6 +2,7 @@ import { Router } from 'express'
 
 import authMiddleware from '../app/middlewares/authMiddleware'
 import CompanyController from '../app/controllers/CompanyController'
+import CompanyMemberController from '../app/controllers/CompanyMemberController'
 
 const router = Router()
 
@@ -130,5 +131,6 @@ router.get(
  *         description: Erro interno do servidor.
  */
 router.get('/companies', CompanyController.listCompanies)
+router.post('/teste', CompanyMemberController.createInvitation)
 
 export default router
