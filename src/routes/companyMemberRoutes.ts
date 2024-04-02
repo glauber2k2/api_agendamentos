@@ -16,4 +16,10 @@ router.post(
   CompanyMemberController.addUserToCompany,
 )
 
+router.get(
+  '/invitations',
+  authMiddleware,
+  CompanyMemberController.listInvitations,
+)
+
 export default router

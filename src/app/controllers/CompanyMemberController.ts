@@ -142,6 +142,49 @@ class CompanyController {
       })
     }
   }
+
+  async listInvitations(req: Request, res: Response) {
+    // Extrai os filtros da query string
+    const { status, companyId, userId } = req.query
+
+    try {
+      const invitationRepository = getRepository(Invitation)
+
+      // Cria um objeto com os filtros disponíveis
+      const filters: {
+        status?: string
+        invitingCompany?: string
+        invitedUser?: string
+      } = {}
+
+      // Aplica os filtros se estiverem presentes
+      if (status) filters.status = status as string
+      if (companyId) filters.invitingCompany = companyId as string
+      if (userId) filters.invitedUser = userId as string
+
+      // Realiza a busca no banco de dados com os filtros aplicados
+      const invitations = await invitationRepository.find({ where: filters })
+
+      if (invitations.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Nenhum convite encontrado com os filtros aplicados.',
+        })
+      }
+
+      return res.status(200).json({
+        success: true,
+        invitations,
+      })
+    } catch (error) {
+      console.error('Error listing invitations:', error)
+      return res.status(500).json({
+        success: false,
+        message: 'Ocorreu um erro ao listar os convites.',
+        error,
+      })
+    }
+  }
 }
 
 export default new CompanyController()
