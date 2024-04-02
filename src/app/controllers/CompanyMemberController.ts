@@ -150,7 +150,7 @@ class CompanyController {
     try {
       const invitationRepository = getRepository(Invitation)
 
-      // Cria um objeto com os filtros disponíveis
+      // Define o tipo do objeto filters
       const filters: {
         status?: string
         invitingCompany?: string
@@ -163,7 +163,10 @@ class CompanyController {
       if (userId) filters.invitedUser = userId as string
 
       // Realiza a busca no banco de dados com os filtros aplicados
-      const invitations = await invitationRepository.find({ where: filters })
+      const invitations = await invitationRepository.find({
+        where: filters,
+        relations: ['invitingCompany', 'invitedUser'], // Inclui as relações na consulta
+      })
 
       if (invitations.length === 0) {
         return res.status(404).json({
@@ -172,9 +175,23 @@ class CompanyController {
         })
       }
 
+      // Mapeia os convites para incluir apenas as informações necessárias
+      const formattedInvitations = invitations.map((invitation) => ({
+        id: invitation.id,
+        status: invitation.status,
+        company: {
+          id: invitation.invitingCompany.id,
+          name: invitation.invitingCompany.name,
+        },
+        user: {
+          id: invitation.invitedUser.id,
+          name: invitation.invitedUser.name,
+        },
+      }))
+
       return res.status(200).json({
         success: true,
-        invitations,
+        invitations: formattedInvitations,
       })
     } catch (error) {
       console.error('Error listing invitations:', error)
