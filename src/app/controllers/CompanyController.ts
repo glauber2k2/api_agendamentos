@@ -96,26 +96,28 @@ class CompanyController {
       cnpj,
       identifier,
       description,
-      main_company_id,
+      main_identifier,
     } = req.body
-    const id = req.userId
+    const userId = req.userId
 
     try {
       const userRepository = getRepository(User)
-      const user = await userRepository.findOne(id)
+      const user = await userRepository.findOne(userId)
 
       if (!user) {
-        return apiResponse(res, 404, 'Usuario não encontrado', false)
+        return apiResponse(res, 404, 'Usuário não encontrado', false)
       }
 
       const companyRepository = getRepository(Company)
       let mainCompanyInstance = null
 
-      if (main_company_id) {
+      if (main_identifier) {
         mainCompanyInstance = await companyRepository
           .createQueryBuilder('company')
           .leftJoinAndSelect('company.user', 'user')
-          .where('company.id = :id', { id: main_company_id })
+          .where('company.identifier = :identifier', {
+            identifier: main_identifier,
+          })
           .getOne()
 
         if (!mainCompanyInstance) {
@@ -128,13 +130,10 @@ class CompanyController {
         }
       }
 
-      console.log('mainCompanyInstance:', mainCompanyInstance)
-      console.log('user:', user)
-
       if (
         mainCompanyInstance &&
         mainCompanyInstance.user &&
-        mainCompanyInstance.user.id !== id
+        mainCompanyInstance.user.id !== userId
       ) {
         return apiResponse(
           res,
