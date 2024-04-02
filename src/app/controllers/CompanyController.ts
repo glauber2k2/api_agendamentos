@@ -112,7 +112,11 @@ class CompanyController {
       let mainCompanyInstance = null
 
       if (main_company_id) {
-        mainCompanyInstance = await companyRepository.findOne(main_company_id)
+        mainCompanyInstance = await companyRepository
+          .createQueryBuilder('company')
+          .leftJoinAndSelect('company.user', 'user')
+          .where('company.id = :id', { id: main_company_id })
+          .getOne()
 
         if (!mainCompanyInstance) {
           return apiResponse(
@@ -122,6 +126,22 @@ class CompanyController {
             false,
           )
         }
+      }
+
+      console.log('mainCompanyInstance:', mainCompanyInstance)
+      console.log('user:', user)
+
+      if (
+        mainCompanyInstance &&
+        mainCompanyInstance.user &&
+        mainCompanyInstance.user.id !== id
+      ) {
+        return apiResponse(
+          res,
+          403,
+          'A empresa principal não pertence ao usuário.',
+          false,
+        )
       }
 
       // Cria a empresa filha
