@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs'
 
 import User from '../models/User'
 import { apiResponse } from '../../utils/apiResponse'
+import sendEmail from '../../utils/sendMail'
 
 interface MyJwtPayload extends JwtPayload {
   userId: string
@@ -29,7 +30,12 @@ class UserController {
       user.password = await bcrypt.hash(newPassword, 8)
 
       await repository.save(user)
-
+      await sendEmail(
+        user.email,
+        `Senha alterada.`,
+        `<p>Sua senha foi alterada, caso não tenha sido você que realizou a mudança, envie um email para: <b>timealignservice@gmail.com</b>.
+      </p>`,
+      )
       return apiResponse(res, 200, 'senha alterada com sucesso', true)
     } catch (error) {
       return apiResponse(res, 400, 'token invalido ou expirado', false, error)
