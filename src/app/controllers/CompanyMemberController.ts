@@ -9,7 +9,8 @@ import sendEmail from '../../utils/sendMail'
 
 class CompanyController {
   async addUserToCompany(req: Request, res: Response) {
-    const { invitationId, userId, status } = req.body
+    const { invitationId, status } = req.body
+    const userId = req.userId
 
     try {
       const userRepository = getRepository(User)
