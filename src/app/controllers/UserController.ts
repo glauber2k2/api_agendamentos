@@ -75,14 +75,15 @@ class UserController {
         where: { username: dataToUpdate.username },
       })
 
-      if (user.username === dataToUpdate.username) {
-        return apiResponse(res, 409, 'Usuário igual ao atual', false)
-      }
       if (usernameExists) {
         return apiResponse(res, 409, 'Nome de usuário já existe.', false)
       }
-      if (user.email === dataToUpdate.email) {
-        return apiResponse(res, 409, 'Email igual ao atual', false)
+
+      if (
+        user.username === dataToUpdate.username &&
+        user.name === dataToUpdate.name
+      ) {
+        return apiResponse(res, 409, 'Dados iguais ao anterior.', false)
       }
 
       user = repository.merge(user, dataToUpdate)
