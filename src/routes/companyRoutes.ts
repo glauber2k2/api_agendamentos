@@ -84,7 +84,7 @@ router.get(
  *     tags: [Company]
  *     parameters:
  *       - in: query
- *         name: ChildBy
+ *         name: childBy
  *         schema:
  *           type: string
  *         description: ID da empresa pai para filtrar as empresas filhas.

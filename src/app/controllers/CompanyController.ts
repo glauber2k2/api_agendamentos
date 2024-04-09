@@ -30,16 +30,16 @@ class CompanyController {
 
   async listCompanies(req: Request, res: Response) {
     try {
-      const { ChildBy, identifier, visibleCompanies } = req.query
+      const { childBy, identifier, visibleCompanies } = req.query
       const companyRepository = getRepository(Company)
-      let companies
+      let companies = [] // Inicializa companies como um array vazio
 
-      // Se o filtro ChildBy estiver presente na query params
-      if (ChildBy) {
-        // Verifica se o parentId foi fornecido
+      // Se o filtro childBy estiver presente na query params
+      if (childBy) {
         const childCompanies = await companyRepository.find({
-          where: { main_company_id: ChildBy },
+          where: { main_company_id: childBy },
         })
+        // Não é necessário verificar se childCompanies é vazio, apenas retorna o que encontrou
         return apiResponse(
           res,
           200,
@@ -55,7 +55,8 @@ class CompanyController {
           where: { identifier },
         })
         if (!company) {
-          return apiResponse(res, 404, 'Empresa não encontrada.', false)
+          // Retorna um array vazio se nenhuma empresa foi encontrada
+          return apiResponse(res, 200, 'Sucesso ao listar empresas.', true, [])
         }
         companies = [company]
       } else {
@@ -70,6 +71,7 @@ class CompanyController {
         }
       }
 
+      // Retorna o que encontrou, mesmo que seja um array vazio
       return apiResponse(
         res,
         200,
