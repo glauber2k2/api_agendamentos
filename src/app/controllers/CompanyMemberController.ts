@@ -5,6 +5,7 @@ import UserCompany from '../models/CompanyUser'
 import User from '../models/User'
 import Invitation from '../models/Invitation'
 import { apiResponse } from '../../utils/apiResponse'
+import sendEmail from '../../utils/sendMail'
 
 class CompanyController {
   async addUserToCompany(req: Request, res: Response) {
@@ -105,6 +106,12 @@ class CompanyController {
         invitingCompany: company,
       })
       await invitationRepository.save(invitation)
+      await sendEmail(
+        invitedUser.email,
+        `Convite de ${company.name}`,
+        `<p>Você recebeu um convite para fazer parte de <b>${company.name}</b> no sistema da TimeAlign.
+      </p>`,
+      )
 
       return apiResponse(res, 201, 'Convite enviado.', true, invitation)
     } catch (error) {
